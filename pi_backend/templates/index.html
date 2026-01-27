@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <title>BlastGate</title>
+  <meta name="viewport" content="width=1024, height=600, initial-scale=1.0">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<h1>BLASTGATE SYSTEM</h1>
+
+<div id="status">Status: <span id="sys-state">–</span></div>
+
+<div id="offline" class="hidden">⚠ Keine Verbindung zum Controller</div>
+
+<hr>
+
+<div id="gates">
+  <!-- Gates werden per JS erzeugt -->
+</div>
+
+<hr>
+
+<div id="motors">
+  Motor 1: <span id="m1">–</span> |
+  Motor 2: <span id="m2">–</span>
+</div>
+
+<hr>
+
+<div id="actions">
+  <button onclick="setState('SERVICE')">SERVICE</button>
+  <button onclick="setState('RUN')">RUN</button>
+  <button class="danger" onclick="clearError()">FEHLER QUITTIEREN</button>
+</div>
+
+<script>
+async function api(url, method="GET", data=null) {
+  const opt = { method };
+  if (data) {
+    opt.headers = {"Content-Type":"application/json"};
+    opt.body = JSON.stringify(data);
+  }
+  const r = await fetch(url, opt);
+  return await r.json();
+}
+
+function createGates() {
+  const g = document.getElementById("gates");
+  g.innerHTML = "";
+  for (let i=0;i<6;i++) {
+    const d = document.createElement("div");
+    d.className = "gate";
+    d.id = "gate-"+i;
+    d.innerHTML = `
+      <strong>Gate ${i+1}</strong><br>
+      Status: <span id="gate-state-${i}">–</span><br>
+      <button onclick="gateCmd(${i},'OPEN')">AUF</button>
+      <button onclick="gateCmd(${i},'CLOSE')">ZU</button>
+    `;
+    g.appendChild(d);
+  }
+}
+
+async function update() {
+  const s = await api("/api/status");
+
+  document.getElementById("offline").classList.toggle("hidden", s.online);
+  document.getElementById("sys-state").textContent = s.state;
+
+  document.getElementById("m1").textContent = s.motor1 ? "EIN" : "AUS";
+  document.getElementById("m2").textContent = s.motor2 ? "EIN" : "AUS";
+
+  s.gates.forEach((open,i)=>{
+    document.getElementById("gate-state-"+i).textContent = open ? "OFFEN" : "ZU";
+  });
+}
+
+function gateCmd(n, action) {
+  api("/api/gate","POST",{gate:n,action});
+}
+
+function setState(s) {
+  api("/api/state","POST",{state:s});
+}
+
+function clearError() {
+  api("/api/error/clear","POST");
+}
+
+createGates();
+setInterval(update, 1000);
+update();
+</script>
+
+</body>
+</html>

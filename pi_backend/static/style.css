@@ -1,0 +1,65 @@
+body {
+  background: #111;
+  color: #eee;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 16px;
+}
+
+h1 {
+  margin-top: 0;
+  font-size: 32px;
+}
+
+#status {
+  font-size: 22px;
+}
+
+#offline {
+  color: #ffb000;
+  font-size: 24px;
+  margin: 10px 0;
+}
+
+.hidden {
+  display: none;
+}
+
+#gates {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.gate {
+  border: 2px solid #444;
+  padding: 12px;
+  border-radius: 6px;
+  background: #1c1c1c;
+}
+
+button {
+  font-size: 18px;
+  padding: 10px 16px;
+  margin: 4px;
+  border-radius: 6px;
+  border: 2px solid #555;
+  background: #333;
+  color: #eee;
+  cursor: pointer;
+}
+
+button:active {
+  background: #555;
+}
+
+button.danger {
+  background: #a00000;
+  border-color: #a00000;
+}
+
+hr {
+  border: none;
+  border-top: 2px solid #333;
+  margin: 16px 0;
+}
